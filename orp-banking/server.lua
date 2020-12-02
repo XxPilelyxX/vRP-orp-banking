@@ -11,10 +11,10 @@ AddEventHandler('orp:bank:deposit', function(amount)
 	
 	local user_id = vRP.getUserId({source})
 	if amount == nil or amount <= 0 or amount > vRP.getBankMoney({user_id}) then
-		TriggerClientEvent('orp:bank:notify', source, "error", "Invalid Amount")
+		TriggerClientEvent('orp:bank:notify', source, "error", "Ugyldig værdi")
 	else
 		vRP.tryDeposit({user_id, tonumber(amount)})
-		TriggerClientEvent('orp:bank:notify', source, "success", "You successfully deposit $" .. amount)
+		TriggerClientEvent('orp:bank:notify', source, "success", "Du indsatte " .. amount.."DKK")
 	end
 end)
 
@@ -26,32 +26,34 @@ AddEventHandler('orp:bank:withdraw', function(amount)
 	amount = tonumber(amount)
 	min = vRP.getBankMoney({user_id})
 	if amount == nil or amount <= 0 or amount > min then
-		TriggerClientEvent('orp:bank:notify', source, "error", "Invalid Amount")
+		TriggerClientEvent('orp:bank:notify', source, "error", "Ugyldig værdi")
 	else
 		vRP.tryWithdraw({user_id,amount})
-		TriggerClientEvent('orp:bank:notify', source, "success", "You successfully withdraw $" .. amount)
+		TriggerClientEvent('orp:bank:notify', source, "success", "Du hvæde " .. amount.."DKK")
 	end
 end)
 
 RegisterServerEvent('orp:bank:balance')
 AddEventHandler('orp:bank:balance', function()
 	
-	local _source = source
-	local user_id = vRP.getUserId({user_id})
+	local source = source
+	local user_id = vRP.getUserId({source})
 	balance = vRP.getBankMoney({user_id})
-	TriggerClientEvent('orp:bank:info', _source, balance)
+	TriggerClientEvent('orp:bank:info', source, balance)
 end)
 
 RegisterServerEvent('orp:bank:transfer')
-AddEventHandler('orp:bank:transfer', function(to, amountt)
+AddEventHandler('orp:bank:transfer', function(datainfo)
 	local _source = source
+	local xTarget = tonumber(datainfo.to)
 	local xPlayer = vRP.getUserId({_source})
-	local xTarget = vRP.getUserId({to})
-	local amount = amountt
+	local amount = datainfo.amountt
 	local balance = 0
 
-	if(xTarget == nil or xTarget == -1) then
-		TriggerClientEvent('orp:bank:notify', _source, "error", "Recipient not found")
+	if xTarget == nil then
+		TriggerClientEvent('orp:bank:notify', _source, "error", "Id ikke fundet")
+	elseif xTarget == xPlayer then
+		TriggerClientEvent('orp:bank:notify', _source, "error", "Du kan ikke overføre til dig selv")
 	else
 		balance = vRP.getBankMoney({xPlayer})
 		zbalance = vRP.getBankMoney({xTarget})
@@ -65,7 +67,7 @@ AddEventHandler('orp:bank:transfer', function(to, amountt)
 				vRP.setBankMoney({xPlayer, balance-tonumber(amount)})
 				vRP.giveBankMoney({xTarget, tonumber(amount)})
 				TriggerClientEvent('orp:bank:notify', _source, "success", "You successfully transfer $" .. amount)
-				TriggerClientEvent('orp:bank:notify', to, "success", "You have just received $" .. amount .. ' via transfer')
+				TriggerClientEvent('orp:bank:notify', xTarget, "success", "You have just received $" .. amount .. ' via transfer')
 			end
 		end
 	end
