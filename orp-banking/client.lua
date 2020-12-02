@@ -187,13 +187,14 @@ function closePlayersBank()
 end
 
 RegisterNUICallback('transfer', function(data)
-    TriggerServerEvent('orp:bank:transfer', data.to, data.amountt)
+    local datainfo = {to = data.to, amountt = data.amountt}
+    TriggerServerEvent('orp:bank:transfer', datainfo)
     TriggerServerEvent('orp:bank:balance')
 end)
 
 RegisterNetEvent('orp:bank:notify')
 AddEventHandler('orp:bank:notify', function(type, message)
-    exports['mythic_notify']:DoHudText(type, message)
+    TriggerEvent("pNotify:SendNotification",{text = message,type = type,timeout = (3000),layout = "bottomRight",queue = "global",animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
 end)
 
 AddEventHandler('onResourceStop', function(resource)
