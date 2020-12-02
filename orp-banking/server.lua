@@ -29,7 +29,7 @@ AddEventHandler('orp:bank:withdraw', function(amount)
 		TriggerClientEvent('orp:bank:notify', source, "error", "Ugyldig værdi")
 	else
 		vRP.tryWithdraw({user_id,amount})
-		TriggerClientEvent('orp:bank:notify', source, "success", "Du hvæde " .. amount.."DKK")
+		TriggerClientEvent('orp:bank:notify', source, "success", "Du hævede " .. amount.."DKK")
 	end
 end)
 
@@ -51,24 +51,20 @@ AddEventHandler('orp:bank:transfer', function(datainfo)
 	local balance = 0
 
 	if xTarget == nil then
-		TriggerClientEvent('orp:bank:notify', _source, "error", "Id ikke fundet")
+		TriggerClientEvent('orp:bank:notify', _source, "error", "IDet ikke fundet")
 	elseif xTarget == xPlayer then
 		TriggerClientEvent('orp:bank:notify', _source, "error", "Du kan ikke overføre til dig selv")
 	else
 		balance = vRP.getBankMoney({xPlayer})
 		zbalance = vRP.getBankMoney({xTarget})
 		
-		if tonumber(_source) == tonumber(to) then
-			TriggerClientEvent('orp:bank:notify', _source, "error", "You cannot transfer money to yourself")
+		if balance <= 0 or balance < tonumber(amount) or tonumber(amount) <= 0 then
+			TriggerClientEvent('orp:bank:notify', _source, "error", "Du har ikke nok penge til at overføre dette beløb")
 		else
-			if balance <= 0 or balance < tonumber(amount) or tonumber(amount) <= 0 then
-				TriggerClientEvent('orp:bank:notify', _source, "error", "You don't have enough money for this transfer")
-			else
-				vRP.setBankMoney({xPlayer, balance-tonumber(amount)})
-				vRP.giveBankMoney({xTarget, tonumber(amount)})
-				TriggerClientEvent('orp:bank:notify', _source, "success", "You successfully transfer $" .. amount)
-				TriggerClientEvent('orp:bank:notify', xTarget, "success", "You have just received $" .. amount .. ' via transfer')
-			end
+			vRP.setBankMoney({xPlayer, balance-tonumber(amount)})
+			vRP.giveBankMoney({xTarget, tonumber(amount)})
+			TriggerClientEvent('orp:bank:notify', _source, "success", "Du overførte nu " .. amount.."DKK")
+			TriggerClientEvent('orp:bank:notify', xTarget, "success", "Du modtog lige " .. amount .. 'DKK via hævede')
 		end
 	end
 end)
