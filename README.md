@@ -15,3 +15,5 @@ Pilely - https://github.com/XxPilelyxX - For at omkode
 ## Preview
 https://streamable.com/0773w4
 
+## Min discord
+link: https://discord.gg/txsA97C
